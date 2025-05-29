@@ -3,15 +3,29 @@ from transformers import AutoTokenizer, AutoModel
 
 
 class Embedder:
-    def __init__(self, model_dir: str):
-        self.tokenizer = AutoTokenizer.from_pretrained(model_dir)
-        self.model = AutoModel.from_pretrained(model_dir)
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance.tokenizer = AutoTokenizer.from_pretrained(
+                "distilbert-base-uncased")
+            cls._instance.model = AutoModel.from_pretrained(
+                "distilbert-base-uncased")
+            cls._instance.model.eval()
+        return cls._instance
 
     def encode(self, texts: list[str]) -> list[list[float]]:
         inputs = self.tokenizer(
-            texts, padding=True, truncation=True, return_tensors='pt'
+            texts,
+            truncation=True,
+            padding="longest",
+            return_tensors="pt",
+            max_length=256,
         )
         with torch.no_grad():
             last_hidden = self.model(**inputs).last_hidden_state
-            embeddings = last_hidden[:, 0, :].cpu().tolist()
-        return embeddings
+        return last_hidden[:, 0, :].cpu().tolist()
+
+
+embedder = Embedder()

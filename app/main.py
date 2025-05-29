@@ -1,12 +1,15 @@
 from fastapi import FastAPI, Depends, HTTPException
+from sqlalchemy import text
 from app.schemas import (
     ReviewIn, TaskOut, SimilarOut
 )
 from app.config import DATABASE_URL
 from app.models import Base, engine, get_db_session
-from app.ml.embedder import Embedder
+from app.ml.embedder import embedder
 from app.services.reviews import save_review
-from app.task import find_similar_reviews
+from app.tasks import find_similar_reviews
+
+from pgvector.asyncpg import register_vector
 
 app = FastAPI()
 
@@ -15,14 +18,14 @@ app = FastAPI()
 @app.on_event("startup")
 async def on_startup():
     async with engine.begin() as conn:
+        await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector;"))
         await conn.run_sync(Base.metadata.create_all)
 
 
 # Добавление отзыва
 @app.post("/add_review")
 async def add_review(payload: ReviewIn):
-    emb = Embedder(
-        model_dir='models/distilbert-imdb').encode([payload.text])[0]
+    emb = embedder.encode([payload.text])[0]
     review_id = await save_review(payload.text, payload.sentiment, emb)
     return {"id": review_id}
 

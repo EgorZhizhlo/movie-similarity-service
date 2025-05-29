@@ -16,7 +16,8 @@ def fine_tune():
 
     def preprocess(batch):
         tokens = tokenizer(
-            batch['text'], truncation=True, padding='max_length', max_length=256
+            batch['text'], truncation=True,
+            padding='max_length', max_length=256
         )
         tokens['labels'] = batch['label']
         return tokens
