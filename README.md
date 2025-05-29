@@ -11,23 +11,22 @@
 ```
 
 movie-similarity-service/
-├── .env                  # переменные окружения
-├── docker-compose.yml    # сборка контейнеров
-├── Dockerfile            # образ для web и worker
-├── requirements.txt      # зависимости Python
-└── app/
-├── config.py             # загрузка .env
-├── schemas.py            # Pydantic формы
-├── main.py               # FastAPI-приложение
-├── models.py             # Async SQLAlchemy + pgvector
-├── services/
-│   └── reviews.py        # DAL: save\_review, find\_similar
-├── tasks.py              # Celery-таска find\_similar\_reviews
-└── ml/
-├── embedder.py           # обёртка DistilBERT для инференса
-└── train.py              # скрипт дообучения на IMDB (опционально)
-
-````
+* .env                  # переменные окружения
+* docker-compose.yml    # сборка контейнеров
+* Dockerfile            # образ для web и worker
+* requirements.txt      # зависимости Python
+- app/
+  * config.py             # загрузка .env
+  * schemas.py            # Pydantic формы
+  * main.py               # FastAPI-приложение
+  * models.py             # Async SQLAlchemy + pgvector
+  * services/
+    - reviews.py        # DAL: save\_review, find\_similar
+  * tasks.py              # Celery-таска find\_similar\_reviews
+  * ml/
+    - embedder.py           # обёртка DistilBERT для инференса
+    - train.py              # скрипт дообучения на IMDB (опционально)
+```
 
 ---
 
